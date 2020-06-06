@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "ltp-api-client-lib"
+version = "0.1.0"
+description = "Bagit package"
+authors = ["Radim Spigel <spigel@cesnet.cz>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+requests = "^2.21.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+
+[build-system]
+requires = ["poetry>=0.12", "requests"]
+build-backend = "poetry.masonry.api"
