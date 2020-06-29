@@ -20,7 +20,6 @@ def cli(ctx, token, context, address):
 @click.group()
 @click.pass_context
 def archive(ctx):
-    click.echo(f'Initialized the database {ctx.obj}')
     token = ctx.obj['token']
     context = ctx.obj['context']
     address = ctx.obj['address']
@@ -32,10 +31,9 @@ def archive(ctx):
 @click.option('--data', '-d', required=True, help='Data in JSON format: {"name": "test", "user_metadata": {}}')
 @click.pass_context
 def create(ctx, path, data):
-    print(f'{path} {data}')
     data = json.loads(data)
     resp = ctx.obj["archive"].create(data, path)
-    print(f"{resp}")
+    pprint.pprint(resp.data)
 
 
 @click.command()
@@ -49,7 +47,7 @@ def update(ctx, id, data, path=None):
         resp = ctx.obj["archive"].patch(id, data)
     else:
         resp = ctx.obj["archive"].put(id, data, path)
-    print(f"{resp}")
+    pprint.pprint(resp.data)
 
 
 @click.command()
@@ -57,7 +55,6 @@ def update(ctx, id, data, path=None):
 @click.pass_context
 def get(ctx, id):
     resp = ctx.obj["archive"].get(id)
-    print(f"{resp}")
     pprint.pprint(resp.data)
 
 
@@ -84,7 +81,6 @@ def audit(ctx):
 @click.pass_context
 def get_for_archive(ctx, id, limit):
     resp = ctx.obj["audit"].get_for_archive(id, limit)
-    print(f"{resp}")
     pprint.pprint(resp.data)
 
 
