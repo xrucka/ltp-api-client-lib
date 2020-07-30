@@ -1,6 +1,18 @@
 import requests
 import json
+import os
 from .ltp_api_client import LtpApiClient, LtpResponse, custom_response
+CHUNK_SIZE_128M = 134217728
+
+
+def read_in_chunks(file_object, chunk_size=CHUNK_SIZE_128M):
+    """Lazy function (generator) to read a file piece by piece.
+    Default chunk size: 1k."""
+    while True:
+        data = file_object.read(chunk_size)
+        if not data:
+            break
+        yield data
 
 
 class Archive(LtpApiClient):
@@ -21,6 +33,36 @@ class Archive(LtpApiClient):
         super(Archive, self).__init__(ltp_api_address)
         self.subtype = "archive"
 
+    @staticmethod
+    def _upload(response_api, path):
+        print(response_api)
+        parts_url = response_api["parts_url"]
+        chunk_size = response_api["chunk_size"]
+        checksum_update = response_api["checksum_update"]
+        finish_url = response_api["finish_url"]
+        upload_id = response_api["upload_id"]
+        origin = response_api["origin"]
+        parts = []
+        filename = os.path.basename(path)
+        with open(path, "rb") as rf:
+            for part_no, chunk in enumerate(read_in_chunks(rf, chunk_size)):
+                url = parts_url[part_no]
+                print(f"uploading part {part_no} to url: {url}")
+                res = requests.put(url, data=chunk)
+                print(f"headers: {res.headers}")
+                etag = res.headers.get('ETag')
+                parts.append({'ETag': etag, 'PartNumber': part_no + 1})
+        s3_response = requests.post(finish_url, json={
+            "checksum_update": checksum_update,
+            "upload_id": upload_id,
+            "parts": parts,
+            "origin": origin,
+            "filename": filename
+        })
+        print(s3_response, s3_response.text)
+
+        return LtpResponse(s3_response)
+
     def create(self, data: dict, path: str) -> LtpResponse:
         """
         Creates archive.
@@ -38,15 +80,7 @@ class Archive(LtpApiClient):
                                  json=data,
                                  headers=self.header)
         response_api = json.loads(response.json())
-        print(response_api)
-        p = path.split("/")
-        filename = p[len(p) - 1]
-        with open(path, "rb") as rf:
-            s3_request_data = response_api["data"]["fields"]
-            url = response_api["data"]["url"]
-            s3_response = requests.post(url, data=s3_request_data, files={"file": (filename, rf)})
-            print(s3_response, s3_response.text)
-        return LtpResponse(s3_response)
+        return self._upload(response_api, path)
 
     def get(self, pk: int) -> LtpResponse:
         """
@@ -95,14 +129,7 @@ class Archive(LtpApiClient):
                             json=new_data,
                             headers=self.header)
         response_api = json.loads(resp.json())
-        p = path.split("/")
-        filename = p[len(p) - 1]
-        with open(path, "rb") as rf:
-            s3_request_data = response_api["data"]["fields"]
-            url = response_api["data"]["url"]
-            s3_response = requests.post(url, data=s3_request_data, files={"file": (filename, rf)})
-            print(s3_response, s3_response.text)
-        return LtpResponse(s3_response)
+        return self._upload(response_api, path)
 
     def patch(self, pk, new_data: dict = None) -> LtpResponse:
         """
