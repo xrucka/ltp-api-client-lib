@@ -35,7 +35,7 @@ class Archive(LtpApiClient):
 
     @staticmethod
     def _upload(response_api, path):
-        print(response_api)
+        print(f"Uploading {response_api}")
         parts_url = response_api["parts_url"]
         chunk_size = response_api["chunk_size"]
         checksum_update = response_api["checksum_update"]
@@ -50,10 +50,11 @@ class Archive(LtpApiClient):
                 print(f"uploading part {part_no} to url: {url}")
                 res = requests.put(url, data=chunk)
                 print(f"headers: {res.headers}")
-                etag = res.headers.get('ETag')
-                parts.append({'ETag': etag, 'PartNumber': part_no + 1})
+                etag = res.headers.get('ETag', "")
+                parts.append({'ETag': etag.replace("\"", ""), 'PartNumber': part_no + 1})
+        print(f"Finishing checksum_update: {checksum_update}, upload_id: {upload_id}, {origin}, filename: {filename} - {parts}")
         s3_response = requests.post(finish_url, json={
-            "checksum_update": checksum_update,
+            "checksum": checksum_update,
             "upload_id": upload_id,
             "parts": parts,
             "origin": origin,
@@ -76,6 +77,7 @@ class Archive(LtpApiClient):
         url = self.build_url()
         if data is not None and isinstance(data, dict):
             data.update({"group": self.context})
+        data.update({"file_size": os.path.getsize(path)})
         response = requests.post(url,
                                  json=data,
                                  headers=self.header)
@@ -125,6 +127,7 @@ class Archive(LtpApiClient):
         url = self.build_url(extend_url=[f"{pk}"])
         if new_data is not None and isinstance(new_data, dict):
             new_data.update({"group": self.context})
+        data.update({"file_size": os.path.getsize(path)})
         resp = requests.put(url,
                             json=new_data,
                             headers=self.header)

@@ -64,7 +64,7 @@ class LtpResponse:
         try:
             self.data = response.json()
         except Exception as e:
-            print(e)
+            print(f"Response xception {e}")
             self.data = {}
 
 
