@@ -2,6 +2,8 @@ import requests
 import json
 import os
 from .ltp_api_client import LtpApiClient, LtpResponse, custom_response
+import time
+
 CHUNK_SIZE_128M = 134217728
 
 
@@ -13,6 +15,29 @@ def read_in_chunks(file_object, chunk_size=CHUNK_SIZE_128M):
         if not data:
             break
         yield data
+
+def upload_part(url, file_name, cursor, part_no, chunk_size):
+    with open(file_name, "rb") as rf:
+        rf.seek(cursor)
+        data = rf.read(chunk_size)
+        print(f"{part_no} data size: {len(data)}")
+        if data is None or len(data) == 0:
+            return None
+        for i in range(0, 5):
+            try:
+                print(f"uploading part {part_no} to url: {url}")
+                res = requests.put(url, data=data)
+                if "Connection" in res.headers and res.headers["Connection"] == "close":
+                    continue
+                print(f"{part_no} - headers: {res.headers}")
+                etag = res.headers.get('ETag', "")
+                return {'ETag': etag.replace("\"", ""), 'PartNumber': part_no}
+            except Exception as e:
+                print(f"Error {e} tryies: {i}")
+                time.sleep(1)
+
+
+
 
 
 class Archive(LtpApiClient):
@@ -35,6 +60,8 @@ class Archive(LtpApiClient):
 
     @staticmethod
     def _upload(response_api, path):
+        import time
+        import multiprocessing as mp
         print(f"Uploading {response_api}")
         parts_url = response_api["parts_url"]
         chunk_size = response_api["chunk_size"]
@@ -42,16 +69,41 @@ class Archive(LtpApiClient):
         finish_url = response_api["finish_url"]
         upload_id = response_api["upload_id"]
         origin = response_api["origin"]
+        expected_num_chunks = response_api["num_chunks"]
         parts = []
         filename = os.path.basename(path)
-        with open(path, "rb") as rf:
-            for part_no, chunk in enumerate(read_in_chunks(rf, chunk_size)):
-                url = parts_url[part_no]
-                print(f"uploading part {part_no} to url: {url}")
-                res = requests.put(url, data=chunk)
-                print(f"headers: {res.headers}")
-                etag = res.headers.get('ETag', "")
-                parts.append({'ETag': etag.replace("\"", ""), 'PartNumber': part_no + 1})
+        pool = mp.Pool(8)
+        futures = []
+        #with open(path, "rb") as rf:
+        if 1:
+            for i in range(0, expected_num_chunks):
+                url = parts_url[i]
+                part_no = i + 1
+                cursor = i*chunk_size
+                futures.append(pool.apply_async(upload_part, args=[url, path, cursor, part_no, chunk_size]))
+            pool.close()
+            pool.join()
+            for fut in futures:
+                part = fut.get()
+                if part is not None:
+                    parts.append(part)
+            #for part_no, chunk in enumerate(read_in_chunks(rf, chunk_size)):
+            #    if chunk is None or len(chunk) == 0:
+            #        break
+            #    url = parts_url[part_no]
+
+            #    for i in range(0, 3):
+            #        try:
+            #            print(f"uploading part {part_no} to url: {url}")
+            #            res = requests.put(url, data=chunk)
+            #            print(f"headers: {res.headers}")
+            #            etag = res.headers.get('ETag', "")
+            #            parts.append({'ETag': etag.replace("\"", ""), 'PartNumber': part_no + 1})
+            #            break
+            #        except Exception as e:
+            #            print(f"Error {e} tryies: {i}")
+            #            time.sleep(1)
+
         print(f"Finishing checksum_update: {checksum_update}, upload_id: {upload_id}, {origin}, filename: {filename} - {parts}")
         s3_response = requests.post(finish_url, json={
             "checksum": checksum_update,
