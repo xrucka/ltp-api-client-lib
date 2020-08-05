@@ -49,6 +49,13 @@ def update(ctx, id, data, path=None):
         resp = ctx.obj["archive"].put(id, data, path)
     pprint.pprint(resp.data)
 
+@click.command(name="download")
+@click.option('--id', '-i', type=int, required=True, help='Primary key of archive object')
+@click.option('--path', '-p', help='Path to archive which should replace archive on selected id')
+@click.pass_context
+def download(ctx, id, path):
+    resp = ctx.obj["archive"].download(id, path)
+    pprint.pprint(resp.data)
 
 @click.command()
 @click.option('--id', '-i', type=int, required=True, help='Primary key of archive object')
@@ -96,6 +103,7 @@ archive.add_command(create)
 archive.add_command(update)
 archive.add_command(get)
 archive.add_command(list_)
+archive.add_command(download)
 audit.add_command(get_for_archive)
 audit.add_command(list_for_archive)
 cli.add_command(archive)

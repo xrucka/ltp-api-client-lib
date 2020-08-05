@@ -156,14 +156,18 @@ class Archive(LtpApiClient):
         :return:
         """
         self._setup_header()
-        url = self.build_url(get_attr={"group": {self.context}}, extend_url=[f"{pk}", "download"])
+        url = self.build_url(extend_url=[f"{pk}", "download"])
+        print(f"{url} - {self.context}")
         response = requests.get(url, headers=self.header)
-        resp = LtpResponse(response)
-        req = requests.get(resp.data.get("url"))
-        with open(destination_path, 'wb') as wf:
-            for chunk in req.iter_content(chunk_size):
-                wf.write(chunk)
-        return custom_response(200, "OK", {"Message": f"Archive was download successfully to {destination_path}"})
+        if response.status_code == 204:
+            return custom_response(200, "OK", {"Message":"Package preparing please try again later"})
+        elif response.status_code == 200:
+            resp = response.json()
+            req = requests.get(resp.get("url"))
+            with open(destination_path, 'wb') as wf:
+                for chunk in req.iter_content(chunk_size):
+                    wf.write(chunk)
+            return custom_response(200, "OK", {"Message": f"Archive was download successfully to {destination_path}"})
 
     def put(self, pk: int, new_data: dict = None, path: str = "") -> LtpResponse:
         """
