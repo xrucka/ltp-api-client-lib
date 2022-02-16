@@ -5,7 +5,7 @@ from .ltp_api_client import LtpApiClient, LtpResponse
 class Audit(LtpApiClient):
     def __init__(self, ltp_api_address=None):
         super(Audit, self).__init__(ltp_api_address)
-        self.subtype = "audit"
+        self.subtype = 'audit'
 
     def get_for_archive(self, archive_pk: int, limit=10):
         """
@@ -15,7 +15,10 @@ class Audit(LtpApiClient):
         :return:
         """
         self._setup_header()
-        url = self.build_url(get_attr={"group": self.context, "limit": limit}, extend_url=["archive", f"{archive_pk}"])
+        url = self.build_url(
+            get_attr={'group': self.context, 'limit': limit},
+            extend_url=['archive', f'{archive_pk}'],
+        )
         response = requests.get(url, headers=self.header)
         return LtpResponse(response)
 
@@ -26,6 +29,6 @@ class Audit(LtpApiClient):
         :return:
         """
         self._setup_header()
-        url = self.build_url(get_attr={"group": self.context, "limit": limit})
+        url = self.build_url(get_attr={'group': self.context, 'limit': limit})
         response = requests.get(url, headers=self.header)
         return LtpResponse(response)
