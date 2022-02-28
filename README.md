@@ -45,8 +45,8 @@ Then you have all information what you need to use CLI
 Usage: ltp_api_client.py [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  -t, --token TEXT    Token for communication with LTP API  [required]
-  -c, --context TEXT  Context/group for communication with LTP API  [required]
+  -t, --token TEXT    Token for communication with LTP API  [required] (generated in [LTP GUI](https://du.cesnet.cz/cs/navody/ltp/start#user_profile) 
+  -c, --context TEXT  Context/group for communication with LTP API  [required] (group identificator can be found in [user profile](https://du.cesnet.cz/cs/navody/ltp/start#user_profile) 
   -a, --address TEXT  Http address of  LTP API
   --help              Show this message and exit.
 
@@ -57,7 +57,8 @@ Commands:
 
 Upload/Create:
 ```
-python3 ltp_api_client.py -t <TOKEN> -c <GROUP> -a https://ltp-test.cesnet.cz/api/ archive create -d '{"name": "test cli", "user_metadata": {}}' -p /path/to/your/bagit.zip
+python3 ltp_api_client.py -t $API_KEY -c 50b6ea9f0b6842b48bc67556f7409917 -a https://ltp.cesnet.cz/api/ archive create -d '{"name":"test python cli", "user_metadata":{}}' -p /home/user/Desktop/my_bagit_arch.zip 
+
 ```
 
 Download:
