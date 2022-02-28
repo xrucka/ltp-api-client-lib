@@ -62,15 +62,20 @@ Commands:
 Upload/Create:
 ```
 python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesnet.cz/api/ archive create -d '{"name":"test python cli", "user_metadata":{}}' -p /home/user/Desktop/my_bagit_arch.zip 
-
 ```
-
 Download:
 ```
-python3 ltp_api_client.py -t <TOKEN> -c <GROUP> -a https://ltp-test.cesnet.cz/api/ archive download -i 163 -p /tmp/testout.zip
+python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesnet.cz/api/ archive download -i 163 -p /tmp/testout.zip
 ```
-
 List:
 ```
-python3 ltp_api_client.py -t <TOKEN> -c <GROUP> -a https://ltp-test.cesnet.cz/api/ archive list
+python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesnet.cz/api/ archive list
+```
+Update metadata:
+```
+python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesnet.cz/api/ archive update -d '{"name":"test python cli", "user_metadata":{"author":"Albert"}}' -i 166
+```
+List audit logs:
+```
+python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesnet.cz/api/ audit list
 ```
