@@ -34,9 +34,13 @@ pip install -e ltp-api-client-lib-0.1.0/
     ```
 Now you can call endpoint with token.
 
+For CESNET LTP you can generate the token [LTP GUI](https://du.cesnet.cz/cs/navody/ltp/start#user_profile).
+
 ### 2) You need to know uuid group 
 
-Then you have all information what you need to use CLI
+Then you have all information what you need to use CLI.
+
+In case of CESNET LTP group identificator can be found in [user profile](https://du.cesnet.cz/cs/navody/ltp/start#user_profile).
 
 ## Examples
 ### Help
@@ -45,19 +49,19 @@ Then you have all information what you need to use CLI
 Usage: ltp_api_client.py [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  -t, --token TEXT    Token for communication with LTP API  [required] (generated in [LTP GUI](https://du.cesnet.cz/cs/navody/ltp/start#user_profile) 
-  -c, --context TEXT  Context/group for communication with LTP API  [required] (group identificator can be found in [user profile](https://du.cesnet.cz/cs/navody/ltp/start#user_profile) 
+  -t, --token TEXT    Token for communication with LTP API  [required]  
+  -c, --context TEXT  Context/group for communication with LTP API  [required] 
   -a, --address TEXT  Http address of  LTP API
   --help              Show this message and exit.
 
 Commands:
   archive
   audit
-
+```
 
 Upload/Create:
 ```
-python3 ltp_api_client.py -t $API_KEY -c 50b6ea9f0b6842b48bc67556f7409917 -a https://ltp.cesnet.cz/api/ archive create -d '{"name":"test python cli", "user_metadata":{}}' -p /home/user/Desktop/my_bagit_arch.zip 
+python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesnet.cz/api/ archive create -d '{"name":"test python cli", "user_metadata":{}}' -p /home/user/Desktop/my_bagit_arch.zip 
 
 ```
 
