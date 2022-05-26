@@ -34,13 +34,13 @@ pip install -e ltp-api-client-lib-0.1.0/
     ```
 Now you can call endpoint with token.
 
-For CESNET LTP you can generate the token [LTP GUI](https://du.cesnet.cz/cs/navody/ltp/start#user_profile).
+For CESNET LTP you have to generate the token in the [LTP GUI](https://du.cesnet.cz/cs/navody/ltp/start#user_profile).
 
 ### 2) You need to know uuid group 
 
 Then you have all information what you need to use CLI.
 
-In case of CESNET LTP group identificator can be found in [user profile](https://du.cesnet.cz/cs/navody/ltp/start#user_profile).
+In case of CESNET LTP group identificator can be found in the [user profile](https://du.cesnet.cz/cs/navody/ltp/start#user_profile).
 
 ## Examples
 ### Help
