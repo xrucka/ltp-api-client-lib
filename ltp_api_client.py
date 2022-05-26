@@ -18,7 +18,7 @@ import json
 @click.option(
     '--address',
     '-a',
-    default='https://rep2.du2.cesnet.cz/api',
+    default='https://ltp.cesnet.cz/api',
     help='Http address of  LTP API',
 )
 @click.pass_context
