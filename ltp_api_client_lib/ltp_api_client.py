@@ -13,7 +13,7 @@ class LtpApiClient:
         self.ltp_api_address = (
             ltp_api_address
             if ltp_api_address is not None
-            else os.environ.get('LTP_API_ADDRESS', 'https://rep2.du2.cesnet.cz/api/')
+            else os.environ.get('LTP_API_ADDRESS', 'https://ltp.cesnet.cz/api/')
         )
         self.ltp_api_address_with_version = os.path.join(self.ltp_api_address, 'v2')
         self.token = os.environ.get('LTP_API_TOKEN', None)
