@@ -1,18 +1,18 @@
 import click
 from ltp_api_client_lib.archive import Archive
 from ltp_api_client_lib.audit import Audit
+from ltp_api_client_lib.bagit import Bagit
 import pprint
 import json
 
 
 @click.group()
 @click.option(
-    '--token', '-t', required=True, help='Token for communication with LTP API'
+    '--token', '-t', help='Token for communication with LTP API'
 )
 @click.option(
     '--context',
     '-c',
-    required=True,
     help='Context/group for communication with LTP API',
 )
 @click.option(
@@ -32,6 +32,8 @@ def cli(ctx, token, context, address):
 @click.group()
 @click.pass_context
 def archive(ctx):
+    if 'token' not in ctx.obj or 'context' not in ctx.obj:
+        return "Context & Token has to be set for archive"
     token = ctx.obj['token']
     context = ctx.obj['context']
     address = ctx.obj['address']
@@ -115,6 +117,8 @@ def list_(ctx, limit=None):
 @click.group()
 @click.pass_context
 def audit(ctx):
+    if 'token' not in ctx.obj or 'context' not in ctx.obj:
+        return "Context & Token has to be set for audit"
     token = ctx.obj['token']
     context = ctx.obj['context']
     address = ctx.obj['address']
@@ -142,6 +146,66 @@ def list_for_archive(ctx, limit=10):
     pprint.pprint(resp.data)
 
 
+
+@click.group()
+@click.pass_context
+def bagit(ctx):
+    ctx.obj['bagit'] = (
+        Bagit()
+    )
+@click.command(name='build')
+@click.option(
+    '--path',
+    '-p',
+    required=True,
+    help='Path to data which are desired to bag-it',
+)
+@click.option(
+    '--json_metadata',
+    '-j',
+    required=True,
+    help='Metadata for bagit see https://datatracker.ietf.org/doc/html/rfc8493#section-2.2.2\
+    minimal is Contact-Name.',
+)
+@click.pass_context
+def build(ctx, path, json_metadata):
+    resp = ctx.obj['bagit'].build(path, json_metadata)
+    pprint.pprint(resp)
+
+
+@click.command(name='zipit')
+@click.option(
+    '--zip_name',
+    '-z',
+    required=True,
+    help='Zip name',
+)
+@click.option(
+    '--path',
+    '-p',
+    required=True,
+    help='Path to data which are desired to zip-it',
+)
+@click.pass_context
+def zipit(ctx, zip_name, path):
+    resp = ctx.obj['bagit'].zipit(zip_name, path)
+    pprint.pprint(resp)
+
+
+@click.command(name='validate')
+@click.option(
+    '--path',
+    '-p',
+    required=True,
+    help='Path to data which are desired to bag-it',
+)
+
+@click.pass_context
+def validate(ctx, path):
+    resp = ctx.obj['bagit'].validate(path)
+    pprint.pprint(resp)
+
+
 archive.add_command(create)
 archive.add_command(update)
 archive.add_command(get)
@@ -151,6 +215,10 @@ audit.add_command(get_for_archive)
 audit.add_command(list_for_archive)
 cli.add_command(archive)
 cli.add_command(audit)
+bagit.add_command(build)
+bagit.add_command(validate)
+bagit.add_command(zipit)
+cli.add_command(bagit)
 
 if __name__ == '__main__':
     cli()

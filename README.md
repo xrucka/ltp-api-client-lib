@@ -57,6 +57,7 @@ Options:
 Commands:
   archive
   audit
+  bagit
 ```
 
 Upload/Create:
@@ -78,4 +79,16 @@ python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesn
 List audit logs:
 ```
 python3 ltp_api_client.py -t $API_KEY -c 50b6eGroup_ID409917 -a https://ltp.cesnet.cz/api/ audit list
+```
+Create bagit:
+```
+python3 ltp_api_client.py bagit build -p <path> -j "{'Contact-Name': 'John Kunze'}"
+```
+Validate bagit:
+```
+python3 ltp_api_client.py bagit validate -p <path>
+```
+Zip dir:
+```
+python3 ltp_api_client.py bagit zipit -z <zip_name> -p <path>
 ```

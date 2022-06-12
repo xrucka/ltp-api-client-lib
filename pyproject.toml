@@ -8,10 +8,10 @@ authors = ["Radim Spigel <spigel@cesnet.cz>"]
 python = "^3.6"
 requests = "^2.21.0"
 click = "^7.1.2"
-
+bagit = "^1.8.0"
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 
 [build-system]
-requires = ["poetry>=0.12", "requests", "click"]
+requires = ["poetry>=0.12", "requests", "click", "setuptools>=42"]
 build-backend = "poetry.masonry.api"
