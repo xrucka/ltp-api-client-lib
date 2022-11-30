@@ -183,9 +183,16 @@ class Archive(LtpApiClient):
         url = self.build_url(extend_url=[f'{pk}'])
         if new_data is not None and isinstance(new_data, dict):
             new_data.update({'group': self.context})
-        data.update({'file_size': os.path.getsize(path)})
+        new_data.update({'file_size': os.path.getsize(path)})
         resp = requests.put(url, json=new_data, headers=self.header)
-        response_api = json.loads(resp.json())
+        if resp.status_code > 200:
+            return LtpResponse(resp)
+        response = resp.json()
+        if isinstance(response, str):
+            response_api = json.loads(resp.json())
+        else:
+            response_api = response
+        print(f"{response_api}")
         return self._upload(response_api, path)
 
     def patch(self, pk, new_data: dict = None) -> LtpResponse:
