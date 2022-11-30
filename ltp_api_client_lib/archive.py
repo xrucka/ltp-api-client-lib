@@ -185,7 +185,7 @@ class Archive(LtpApiClient):
             new_data.update({'group': self.context})
         new_data.update({'file_size': os.path.getsize(path)})
         resp = requests.put(url, json=new_data, headers=self.header)
-        if resp.status_code > 200:
+        if resp.status_code > 300:
             return LtpResponse(resp)
         response = resp.json()
         if isinstance(response, str):
