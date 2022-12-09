@@ -136,7 +136,7 @@ class Archive(LtpApiClient):
         return LtpResponse(response)
 
     def download(
-        self, pk: int, destination_path: str, chunk_size=100_000
+        self, pk: int, destination_path: str, chunk_size=100_000, eagain=200
     ) -> LtpResponse:
         """
         Prepare download package returns url for fetching
@@ -152,7 +152,7 @@ class Archive(LtpApiClient):
         print(f'response {response}')
         if response.status_code == 204:
             return custom_response(
-                200, 'OK', {'Message': 'Package preparing please try again later'}
+                eagain, 'OK', {'Message': 'Package preparing please try again later'}
             )
         elif response.status_code == 200:
             resp = response.json()
